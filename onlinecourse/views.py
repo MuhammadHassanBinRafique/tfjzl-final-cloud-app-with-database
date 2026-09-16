@@ -132,16 +132,21 @@ def show_exam_result(request, course_id, submission_id):
     selected_choice_ids = [choice.id for choice in selected_choices]
 
     total_score = 0
+    total_possible = 0
     for lesson in course.lesson_set.all():
         for question in lesson.question_set.all():
+            total_possible += question.question_grade
             if question.is_get_score(selected_choice_ids):
                 total_score += question.question_grade
+
+    grade = (total_score / total_possible * 100) if total_possible > 0 else 0
 
     context = {
         'course': course,
         'submission': submission,
         'selected_choice_ids': selected_choice_ids,
         'total_score': total_score,
+        'grade': grade,
     }
     return render(request, 'onlinecourse/exam_result_bootstrap.html', context)
 
